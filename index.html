@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DarkNet Stories</title>
+  <link rel="stylesheet" href="./assets/css/main.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap');
+
+    body {
+      cursor: none;
+      background-color: #000;
+    }
+    #torch {
+      position: fixed;
+      pointer-events: none;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 80%);
+      mix-blend-mode: screen;
+      z-index: 10000;
+    }
+    .quote {
+      font-style: italic;
+      color: #ff004d;
+      text-align: center;
+      margin: 2rem auto;
+      opacity: 0.75;
+      animation: floatQuote 16s infinite ease-in-out;
+      max-width: 80%;
+      font-size: 1.3rem;
+      text-shadow: 0 0 10px #ff004d55;
+    }
+    @keyframes floatQuote {
+      0%, 100% { transform: translateY(0); opacity: 0.6; }
+      50% { transform: translateY(-12px); opacity: 1; }
+    }
+    h1 {
+      font-family: 'UnifrakturCook', cursive;
+      font-size: 4rem;
+      color: #ff003c;
+      text-shadow: 0 0 20px #ff003caa, 0 0 40px #ff003c44;
+      text-align: center;
+      margin-top: 2rem;
+      animation: flickerTitle 4s infinite alternate;
+    }
+    @keyframes flickerTitle {
+      0%, 100% { opacity: 1; text-shadow: 0 0 10px #ff003caa; }
+      50% { opacity: 0.8; text-shadow: 0 0 20px #ff003c66; }
+      75% { opacity: 0.6; text-shadow: 0 0 30px #ff003c22; }
+    }
+    .story-card {
+      border: 1px solid #2e2e2e;
+      padding: 1.25rem;
+      margin: 1.5rem;
+      background: #111;
+      color: #e2e2e2;
+      text-shadow: 0 0 2px #000;
+      box-shadow: 0 0 20px #000;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .story-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle at center, rgba(255,0,77,0.05), transparent 70%);
+      z-index: 0;
+    }
+    .story-card:hover {
+      background-color: #1a1a1a;
+      color: #ff004d;
+      transform: scale(1.02);
+      box-shadow: 0 0 25px #ff004d88;
+    }
+    .story-card h2 {
+      font-size: 1.5rem;
+      color: #ff003c;
+      margin-bottom: 0.5rem;
+    }
+    .story-card p {
+      color: #888;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div id="torch"></div>
+  <div class="container">
+    <h1>Echoes from Tomorrow</h1>
+    <div class="quote" id="dark-quote"></div>
+    <div id="story-list"></div>
+  </div>
+
+  <script>
+    const torch = document.getElementById('torch');
+    document.addEventListener('mousemove', (e) => {
+      torch.style.left = `${e.clientX - 100}px`;
+      torch.style.top = `${e.clientY - 100}px`;
+    });
+
+    const quotes = [
+      '"They say he never logged out... and he\'s still in the wires."',
+      '"Midnight is when the darknet breathes."',
+      '"Every click brings you closer to the void."',
+      '"She read the blog. Now the blog reads her."',
+      '"There was blood in the bandwidth."',
+      '"He typed \"hello world\" — the world replied in screams."',
+      '"Red lights blinked. One blinked back."',
+      '"Between the lines of code, something watches."',
+      '"The stream never stopped. Neither did the screaming."',
+      '"She downloaded death, zipped tight in a .rar."',
+      '"When the page loaded, so did the screams."',
+      '"He coded in blood, each script a curse."'
+    ];
+    document.getElementById('dark-quote').textContent = quotes[Math.floor(Math.random() * quotes.length)];
+
+    function cleanTitle(title) {
+      return title
+        .replace(/^\*+|\*+$/g, '') // Remove surrounding asterisks
+        .replace(/^title\s*[:-]?\s*/i, '') // Remove 'title' prefix
+        .replace(/^[-:*]+\s*/, '') // Remove leading - or :
+        .trim();
+    }
+
+    fetch('./stories/index.json')
+      .then((res) => res.json())
+      .then((stories) => {
+        const container = document.getElementById('story-list');
+        stories.forEach((story) => {
+          const cleanedTitle = cleanTitle(story.title);
+          const card = document.createElement('div');
+          card.className = 'story-card';
+          const randomFutureDate = () => {
+  const today = new Date();
+  const yearsAhead = Math.floor(Math.random() *20);
+  today.setFullYear(today.getFullYear() + yearsAhead);
+
+  const daysAhead = Math.floor(Math.random() * 180) + 1; // Random number of days within the next 6 months
+  today.setDate(today.getDate() + daysAhead);
+
+  return today.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+};
+
+const creepyDateOptions = [
+  "The curse will end on",
+  "The haunting begins on",
+  "The last day before the end is",
+  "When the darkness rises, it will be",
+  "The day the veil lifts will be",
+  "When the net closes, it'll be",
+  "The scream will echo until",
+  "The last breath will be drawn on",
+  "The shadow will fall on",
+  "The night of reckoning is set for"
+];
+
+const randomCreepyDate = creepyDateOptions[Math.floor(Math.random() * creepyDateOptions.length)];
+
+card.innerHTML = `<h2>☠ ${cleanedTitle}</h2><p>🕯️ ${randomCreepyDate} ${randomFutureDate()}</p>`;
+
+          card.onclick = () =>
+            (window.location.href = `story-template.html?slug=${story.slug}`);
+          container.appendChild(card);
+        });
+      });
+  </script>
+</body>
+</html>

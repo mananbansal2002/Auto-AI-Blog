@@ -1,17 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DarkNet Stories</title>
-  <link rel="stylesheet" href="./assets/css/main.css">
+  <link rel="stylesheet" href="./assets/css/main.css" />
   <style>
     @import url('https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap');
 
     body {
       cursor: none;
       background-color: #000;
+      margin: 0;
+      padding: 0;
+      position: relative;
     }
+
+    /* Torch Light */
     #torch {
       position: fixed;
       pointer-events: none;
@@ -22,6 +27,28 @@
       mix-blend-mode: screen;
       z-index: 10000;
     }
+
+    /* Glitch Flicker Overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: repeating-linear-gradient(
+        rgba(255, 0, 77, 0.015) 0px,
+        rgba(0, 0, 0, 0.015) 1px,
+        transparent 2px
+      );
+      z-index: 9999;
+      pointer-events: none;
+      mix-blend-mode: overlay;
+      animation: flickerOverlay 1s infinite;
+    }
+
+    @keyframes flickerOverlay {
+      0%, 100% { opacity: 0.03; }
+      50% { opacity: 0.07; }
+    }
+
     .quote {
       font-style: italic;
       color: #ff004d;
@@ -33,10 +60,26 @@
       font-size: 1.3rem;
       text-shadow: 0 0 10px #ff004d55;
     }
+
     @keyframes floatQuote {
       0%, 100% { transform: translateY(0); opacity: 0.6; }
-      50% { transform: translateY(-12px); opacity: 1; }
+      25% { opacity: 0.4; transform: scale(1.01); }
+      50% { transform: translateY(-12px) scale(0.98); opacity: 1; }
+      75% { opacity: 0.5; transform: scale(1.02); }
     }
+
+    .quote::after {
+      content: '_';
+      animation: blinkCursor 1.2s infinite;
+      color: #ff004d;
+      margin-left: 4px;
+    }
+
+    @keyframes blinkCursor {
+      0%, 50%, 100% { opacity: 1; }
+      25%, 75% { opacity: 0; }
+    }
+
     h1 {
       font-family: 'UnifrakturCook', cursive;
       font-size: 4rem;
@@ -46,11 +89,13 @@
       margin-top: 2rem;
       animation: flickerTitle 4s infinite alternate;
     }
+
     @keyframes flickerTitle {
       0%, 100% { opacity: 1; text-shadow: 0 0 10px #ff003caa; }
       50% { opacity: 0.8; text-shadow: 0 0 20px #ff003c66; }
       75% { opacity: 0.6; text-shadow: 0 0 30px #ff003c22; }
     }
+
     .story-card {
       border: 1px solid #2e2e2e;
       padding: 1.25rem;
@@ -63,6 +108,7 @@
       position: relative;
       overflow: hidden;
     }
+
     .story-card::after {
       content: '';
       position: absolute;
@@ -70,20 +116,72 @@
       background: radial-gradient(circle at center, rgba(255,0,77,0.05), transparent 70%);
       z-index: 0;
     }
+
     .story-card:hover {
       background-color: #1a1a1a;
       color: #ff004d;
       transform: scale(1.02);
       box-shadow: 0 0 25px #ff004d88;
     }
+
     .story-card h2 {
       font-size: 1.5rem;
       color: #ff003c;
       margin-bottom: 0.5rem;
     }
+
     .story-card p {
       color: #888;
       font-size: 0.9rem;
+    }
+
+    /* Mobile Styling */
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2.5rem;
+        margin-top: 1.5rem;
+      }
+
+      .quote {
+        font-size: 1rem;
+        margin: 1rem auto;
+      }
+
+      .story-card {
+        margin: 1rem 0.5rem;
+        padding: 1rem;
+      }
+
+      .story-card h2 {
+        font-size: 1.2rem;
+      }
+
+      .story-card p {
+        font-size: 0.85rem;
+      }
+
+      #torch {
+        width: 120px;
+        height: 120px;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 80%);
+      }
+    }
+
+    /* Dark Pulse Tap Animation */
+    @keyframes pulseDark {
+      0% {
+        box-shadow: 0 0 0px rgba(255,0,77,0.1);
+      }
+      50% {
+        box-shadow: 0 0 30px rgba(255,0,77,0.25);
+      }
+      100% {
+        box-shadow: 0 0 0px rgba(255,0,77,0.1);
+      }
+    }
+
+    body.pulse {
+      animation: pulseDark 0.6s ease-out;
     }
   </style>
 </head>
@@ -97,9 +195,22 @@
 
   <script>
     const torch = document.getElementById('torch');
+
     document.addEventListener('mousemove', (e) => {
       torch.style.left = `${e.clientX - 100}px`;
       torch.style.top = `${e.clientY - 100}px`;
+    });
+
+    document.addEventListener('touchmove', (e) => {
+      if (e.touches.length > 0) {
+        torch.style.left = `${e.touches[0].clientX - 60}px`;
+        torch.style.top = `${e.touches[0].clientY - 60}px`;
+      }
+    });
+
+    document.addEventListener('touchstart', () => {
+      document.body.classList.add('pulse');
+      setTimeout(() => document.body.classList.remove('pulse'), 600);
     });
 
     const quotes = [
@@ -134,33 +245,32 @@
           const cleanedTitle = cleanTitle(story.title);
           const card = document.createElement('div');
           card.className = 'story-card';
+
           const randomFutureDate = () => {
-  const today = new Date();
-  const yearsAhead = Math.floor(Math.random() *20);
-  today.setFullYear(today.getFullYear() + yearsAhead);
+            const today = new Date();
+            const yearsAhead = Math.floor(Math.random() * 20);
+            today.setFullYear(today.getFullYear() + yearsAhead);
+            const daysAhead = Math.floor(Math.random() * 180) + 1;
+            today.setDate(today.getDate() + daysAhead);
+            return today.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+          };
 
-  const daysAhead = Math.floor(Math.random() * 180) + 1; // Random number of days within the next 6 months
-  today.setDate(today.getDate() + daysAhead);
+          const creepyDateOptions = [
+            "The curse will end on",
+            "The haunting begins on",
+            "The last day before the end is",
+            "When the darkness rises, it will be",
+            "The day the veil lifts will be",
+            "When the net closes, it'll be",
+            "The scream will echo until",
+            "The last breath will be drawn on",
+            "The shadow will fall on",
+            "The night of reckoning is set for"
+          ];
 
-  return today.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-};
+          const randomCreepyDate = creepyDateOptions[Math.floor(Math.random() * creepyDateOptions.length)];
 
-const creepyDateOptions = [
-  "The curse will end on",
-  "The haunting begins on",
-  "The last day before the end is",
-  "When the darkness rises, it will be",
-  "The day the veil lifts will be",
-  "When the net closes, it'll be",
-  "The scream will echo until",
-  "The last breath will be drawn on",
-  "The shadow will fall on",
-  "The night of reckoning is set for"
-];
-
-const randomCreepyDate = creepyDateOptions[Math.floor(Math.random() * creepyDateOptions.length)];
-
-card.innerHTML = `<h2>☠ ${cleanedTitle}</h2><p>🕯️ ${randomCreepyDate} ${randomFutureDate()}</p>`;
+          card.innerHTML = `<h2>☠ ${cleanedTitle}</h2><p>🕯️ ${randomCreepyDate} ${randomFutureDate()}</p>`;
 
           card.onclick = () =>
             (window.location.href = `story-template.html?slug=${story.slug}`);

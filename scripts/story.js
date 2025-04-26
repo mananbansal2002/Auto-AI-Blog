@@ -9,11 +9,12 @@ if (slug) {
       document.getElementById('story-content').innerHTML = html;
 
       const index = Math.floor(Math.random() * 12) + 1; // 1 to 12
-      const imagePath = `./assets/images/creepy-${index}.jpg`; // change to .png if needed
+      const imagePath = `./assets/images/creepy-${index}.jpg`;
 
       document.body.style.backgroundImage = `url('${imagePath}')`;
       document.body.style.backgroundSize = 'cover';
       document.body.style.backgroundPosition = 'center';
       document.body.style.backgroundRepeat = 'no-repeat';
+      document.body.style.backgroundAttachment = 'fixed'; // This keeps the background still
     });
 }

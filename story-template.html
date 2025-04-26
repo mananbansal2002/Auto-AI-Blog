@@ -2,20 +2,138 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Story</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Story - Dark Hacked</title>
   <link rel="stylesheet" href="./assets/css/main.css">
+  <style>
+    body {
+      margin: 0;
+      background: black;
+      color: lime;
+      font-family: 'Courier New', Courier, monospace;
+    }
+    .overlay {
+      background: rgba(0,0,0,0.7);
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0; left: 0;
+    }
+  </style>
 </head>
 <body>
-    <div class="bg-image" id="bg-image"></div>
-    <div class="overlay"></div>
-  
-    <div class="container">
-      <a href="index.html" class="back-link">← Back to stories</a>
-      <div id="story-content"></div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <div class="bg-image" id="bg-image"></div>
+  <div class="overlay"></div>
 
-    <script src="./scripts/story.js"></script>
-  </body>
+  <div class="container">
+    <a href="index.html" class="back-link">← Back to stories</a>
+    <div id="story-content">
+     
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="./scripts/story.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+  <script>
+  (function hackSimulation() {
+    console.clear();
+    let base64Image = '';
+  
+    function captureScreen() {
+  html2canvas(document.body, {
+    backgroundColor: '#000',
+    windowWidth: window.innerWidth,
+    windowHeight:window.innerHeight,
+    scrollX: 0,
+    scrollY: 0
+  }).then(canvas => {
+    const ctx = canvas.getContext('2d');
+
+    // Make text appear bigger and more "hacked"
+    ctx.save();
+    ctx.translate(canvas.width / 2.5, canvas.height / 2);
+    ctx.rotate((Math.random() - 0.5) * 0.1); // Random slight rotation
+
+    ctx.font = 'bold 80px monospace';
+    ctx.fillStyle = 'red';
+    ctx.textAlign = 'center';
+    ctx.shadowColor = 'black';
+    ctx.shadowBlur = 20;
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 3;
+
+    ctx.strokeText('HACKED', 0, 0); // Stroke first
+    ctx.fillText('HACKED', 0, 0);   // Then fill
+    ctx.restore();
+
+    base64Image = canvas.toDataURL('image/png');
+
+    // First: show screenshot
+    console.log("%c ", `
+      font-size: 1px;
+      padding: ${canvas.height/4}px ${canvas.width/4}px;
+      background: url(${base64Image}) no-repeat center center;
+      background-size: cover;
+    `);
+
+    // Second: show user info
+    showUserInfo();
+  });
+}
+
+    function showUserInfo() {
+      const browserInfo = navigator.userAgent;
+      const screenSize = `${screen.width}x${screen.height}`;
+  
+      fetch('https://ipapi.co/json/')
+        .then(response => response.json())
+        .then(data => {
+          const ip = data.ip || 'Unknown';
+          const city = data.city || 'Unknown';
+          const region = data.region || 'Unknown';
+          const country = data.country_name || 'Unknown';
+          const org = data.org || 'Unknown ISP';
+          console.log(data)
+  
+          console.log(`%c
+  ███████ SYSTEM BREACHED ███████
+  
+  IP Address: ${ip}
+  Location: ${city}, ${region}, ${country}
+  ISP: ${org}
+  
+  Browser: ${browserInfo}
+  Screen Size: ${screenSize}
+  
+  ███ Monitoring Live Activity ███
+  `, "color: lime; font-family: monospace; background: black; padding: 15px; font-size: 16px;");
+        })
+        .catch(() => {
+          console.log(`%c
+  ███████ SYSTEM BREACHED ███████
+  
+  IP Address: Unknown
+  Location: Unknown
+  
+  Browser: ${browserInfo}
+  Screen Size: ${screenSize}
+  
+  ███ Monitoring Live Activity ███
+  `, "color: lime; font-family: monospace; background: black; padding: 15px; font-size: 16px;");
+        });
+    }
+  
+    // Boot up
+    setTimeout(() => {
+      console.log("%c███ Establishing backdoor ███", "color: red; font-size: 20px; font-family: monospace; background: black;");
+      setTimeout(() => {
+        captureScreen();
+      }, 2000);
+    }, 1000);
+  })();
+  </script>
+  
+    </body>
 </html>
